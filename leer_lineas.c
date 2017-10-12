@@ -37,9 +37,8 @@ status_t validar_argumentos(int argc, char *argv[], FILE **fentrada)
 	return ST_OK;
 }
 
-status_t leer_linea(FILE *fentrada, int *cant_lineas, char **linea)
+status_t leer_linea(FILE *fentrada, int *cant_lineas, char **linea,char *c)
 {
-	char c;
 	char *lineaBuffer;
 	int maximumLineLength;
 	int count;
@@ -53,12 +52,12 @@ status_t leer_linea(FILE *fentrada, int *cant_lineas, char **linea)
 	if((lineaBuffer = (char *)malloc(sizeof(char)*maximumLineLength)) == NULL)
 		return ST_ERROR_NO_MEM;
 
-	c = fgetc(fentrada);
-	while ((c != '\n') && (c != EOF))
+	*c = fgetc(fentrada);
+	while ((*c != '\n') && (*c != EOF))
 	{
-		lineaBuffer[count] = c;
+		lineaBuffer[count] = *c;
 		count++;
-		c = fgetc(fentrada);
+		*c = fgetc(fentrada);
 	}
 	lineaBuffer[count] = '\0';
 
@@ -78,7 +77,7 @@ int main (int argc, char *argv[])
 {
 	FILE *fentrada;
 	status_t st;
-	char *linea;
+	char *linea,c;
 	int cant_lineas;
 
 	linea = NULL;
@@ -88,9 +87,9 @@ int main (int argc, char *argv[])
 		return EXIT_FAILURE;
 	}
 
-	for(cant_lineas = 0; cant_lineas <2; cant_lineas++)
+	do
 	{
-		if((st=leer_linea(fentrada,&cant_lineas,&linea)) != ST_OK)
+		if((st=leer_linea(fentrada,&cant_lineas,&linea,&c)) != ST_OK)
 		{
 			if(linea != NULL)
 			{
@@ -102,15 +101,9 @@ int main (int argc, char *argv[])
 		printf("Linea %d) %s\n",cant_lineas +1,linea);
 		free(linea);
 		linea = NULL;
-	}
+	}while(c != EOF);
 	free(linea);
 	linea = NULL;
 
 	return EXIT_SUCCESS;
 }
-
-
-
-
-
-
